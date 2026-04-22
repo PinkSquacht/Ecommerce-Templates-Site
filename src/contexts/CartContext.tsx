@@ -31,7 +31,7 @@ export function useCart() {
 
 export function CartProvider({ children }: CartProviderProps) {
     const [cart, setCart] = useState<CartItem[]>([]);
-    const [cartOpen, setCartOpen] = useState(false);
+    const [, setCartOpen] = useState(false);
 
     const addToCart = useCallback((product: any, id: any) => {
         setCart((cart) => {

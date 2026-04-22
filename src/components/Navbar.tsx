@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
@@ -12,6 +12,9 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Box, Container, Badge } from "@mui/material";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { useStorefront } from "../contexts/StorefrontContext";
+
+// Navbar combines template branding with auth status and cart summary.
 
 const pages = [
   { name: "Home", path: "/" },
@@ -27,8 +30,10 @@ interface IUser {
 function ResponsiveAppBar() {
   const [user, setUser] = useState<IUser>({ uid: "", email: "" });
   const [cartItemCount, setCartItemCount] = useState(0);
+  const { activeTemplate, activeTier } = useStorefront();
 
   const fetchCartItemCount = async (userId: string) => {
+    // Cart quantity is aggregated from user cartItems docs in Firestore.
     const db = getFirestore();
     const cartItemsCollection = collection(db, 'users', userId, 'cartItems');
     const cartItemsSnapshot = await getDocs(cartItemsCollection);
@@ -74,15 +79,9 @@ function ResponsiveAppBar() {
       });
   };
 
-  const handleRemoveItem = async (itemId: string) => {
-    // Your logic to remove the item, update Firestore, etc.
-
-    // After removing, update the cart item count
-    fetchCartItemCount(user.uid);
-  };
-
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: "tan", color: "black" }}>
+    // Accent border is template-dependent so each storefront feels distinct.
+    <AppBar position="sticky" sx={{ backgroundColor: "tan", color: "black", borderBottom: `4px solid ${activeTemplate.accentColor}` }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -101,7 +100,7 @@ function ResponsiveAppBar() {
                 textDecoration: "none",
               }}
             >
-              Muggles Magic
+              {activeTemplate.name}
             </Typography>
           </Box>
 
@@ -117,6 +116,12 @@ function ResponsiveAppBar() {
               {page.name}
             </Button>
           ))}
+
+          {activeTier.hasAdminDashboard ? (
+            <Button sx={{ mr: 2, color: "black" }} component={Link} to="/admin">
+              Admin
+            </Button>
+          ) : null}
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
             {user.email ? (

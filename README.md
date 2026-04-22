@@ -28,3 +28,11 @@ export default {
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+## Refactor Roadmap
+
+- Make the catalog API the source of truth for products.
+- Replace local fallback products with a live Spocket feed and caching.
+- Move featured categories into config or an admin panel.
+- Add checkout/session creation once product ingestion is stable.
+- Keep the UI focused on two core assortments: smart home accessories and eco friendly goods.

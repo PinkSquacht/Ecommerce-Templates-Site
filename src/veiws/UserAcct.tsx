@@ -40,7 +40,18 @@ const UserAcct = () => {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setEditUser(prevState => ({ ...prevState, [name]: value || "" }));
+    const field = name as keyof User;
+
+    setEditUser((prevState) => {
+      if (!prevState) {
+        return prevState;
+      }
+
+      return {
+        ...prevState,
+        [field]: value || "",
+      };
+    });
   };
 
   const handleUserUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
