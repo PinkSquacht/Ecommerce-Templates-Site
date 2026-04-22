@@ -1,38 +1,35 @@
-# React + TypeScript + Vite
+# SquachtTechSolutions
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
+This repository is a template-driven ecommerce web app built to support freelancer and agency workflows. Instead of building each client storefront from scratch, the project provides one reusable codebase that can be adapted through template configuration, service tiers, and layout presets.
 
-Currently, two official plugins are available:
+## Purpose
+The purpose of this project is to accelerate client delivery while still showing strong full-stack engineering practices. It is designed to:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Reuse a shared commerce foundation across multiple storefront styles.
+- Support different service offerings (basic, admin-enabled, and custom tiers).
+- Separate design and layout decisions from core business logic.
+- Allow visual handoff workflows through Bootstrap Studio while keeping React as the production app.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Frontend
+- React 18
+- TypeScript
+- Vite
+- React Router
+- React Bootstrap + Bootstrap 5
+- Material UI (MUI)
 
-- Configure the top-level `parserOptions` property like this:
+### Data and Services
+- Firebase Authentication
+- Firestore
+- Fake Store API (catalog data source)
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+### Tooling
+- ESLint
+- TypeScript compiler
+- Vite build pipeline
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
-
-## Refactor Roadmap
-
-- Make the catalog API the source of truth for products.
-- Replace local fallback products with a live Spocket feed and caching.
-- Move featured categories into config or an admin panel.
-- Add checkout/session creation once product ingestion is stable.
-- Keep the UI focused on two core assortments: smart home accessories and eco friendly goods.
+## Repository Focus
+This codebase focuses on scalable storefront architecture: configurable templates, tier-aware features, and design-system flexibility for rapid client customization.
