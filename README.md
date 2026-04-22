@@ -19,7 +19,8 @@ The purpose of this project is to accelerate client delivery while still showing
 - Vite
 - React Router
 - React Bootstrap + Bootstrap 5
-- Material UI (MUI)
+
+UI note: The project uses a Bootstrap-first UI stack (Material UI has been removed).
 
 ### Data and Services
 - Firebase Authentication
