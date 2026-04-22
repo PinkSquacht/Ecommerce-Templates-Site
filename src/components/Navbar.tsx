@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Link } from "react-router-dom";
-import StoreRoundedIcon from "@mui/icons-material/StoreRounded";
+import { Badge, Button, Container, Nav, Navbar } from "react-bootstrap";
+import { BsCart3, BsShop } from "react-icons/bs";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase";
-import { Box, Container, Badge } from "@mui/material";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { useStorefront } from "../contexts/StorefrontContext";
 
@@ -80,88 +73,58 @@ function ResponsiveAppBar() {
   };
 
   return (
-    // Accent border is template-dependent so each storefront feels distinct.
-    <AppBar position="sticky" sx={{ backgroundColor: "tan", color: "black", borderBottom: `4px solid ${activeTemplate.accentColor}` }}>
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <StoreRoundedIcon sx={{ mr: 1 }} />
-            <Typography
-              variant="h6"
-              noWrap
-              component="a"
-              href="#app-bar-with-responsive-menu"
-              sx={{
-                mr: 2,
-                fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".3rem",
-                color: "inherit",
-                textDecoration: "none",
-              }}
-            >
-              {activeTemplate.name}
-            </Typography>
-          </Box>
+    <Navbar
+      expand="lg"
+      sticky="top"
+      className="py-2"
+      style={{ backgroundColor: "#f1ece1", borderBottom: `4px solid ${activeTemplate.accentColor}` }}
+    >
+      <Container fluid>
+        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2 fw-bold">
+          <BsShop />
+          {activeTemplate.name}
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="main-navbar" />
+        <Navbar.Collapse id="main-navbar">
+          <Nav className="me-auto">
+            {pages.map((page) => (
+              <Nav.Link as={Link} to={page.path} key={page.name}>
+                {page.name}
+              </Nav.Link>
+            ))}
+            {activeTier.hasAdminDashboard ? <Nav.Link as={Link} to="/admin">Admin</Nav.Link> : null}
+          </Nav>
 
-          <Box sx={{ flexGrow: 1 }} />
-
-          {pages.map((page) => (
-            <Button
-              key={page.name}
-              sx={{ mr: 2, color: "black" }}
-              component={Link}
-              to={page.path}
-            >
-              {page.name}
-            </Button>
-          ))}
-
-          {activeTier.hasAdminDashboard ? (
-            <Button sx={{ mr: 2, color: "black" }} component={Link} to="/admin">
-              Admin
-            </Button>
-          ) : null}
-
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <div className="d-flex align-items-center gap-2">
             {user.email ? (
               <>
-                <span>{user.email}</span>
-                <Button
-                  variant="outlined"
-                  color="success"
-                  onClick={handleSignout}
-                  size="small"
-                  sx={{ ml: 2, mr: 2, color: "red" }}
-                >
+                <span className="small text-muted">{user.email}</span>
+                <Button variant="outline-danger" size="sm" onClick={handleSignout}>
                   SignOut
                 </Button>
               </>
             ) : (
-              <Button
-                variant="outlined"
-                color="success"
-                sx={{ mr: 2, color: "light-blue" }}
-                component={Link}
-                to="/login"
-              >
-                Login
-              </Button>
+              <Link to="/login" className="text-decoration-none">
+                <Button variant="outline-success" size="sm">
+                  Login
+                </Button>
+              </Link>
             )}
 
-            <Tooltip title={`Open Cart (${cartItemCount} items)`}>
-              <Link to="/cart">
-                <IconButton sx={{ p: 0, color: "black" }}>
-                  <Badge badgeContent={cartItemCount} color="secondary">
-                    <ShoppingCartIcon />
-                  </Badge>
-                </IconButton>
-              </Link>
-            </Tooltip>
-          </Box>
-        </Toolbar>
+            <Link to="/cart" className="text-decoration-none" title={`Open Cart (${cartItemCount} items)`}>
+              <Button
+                variant="dark"
+                size="sm"
+                className="d-flex align-items-center gap-2"
+              >
+                <BsCart3 />
+                <Badge bg="light" text="dark">{cartItemCount}</Badge>
+              </Button>
+            </Link>
+          </div>
+        </Navbar.Collapse>
       </Container>
-    </AppBar>
+    </Navbar>
   );
 }
 

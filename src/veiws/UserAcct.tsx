@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../firebase"; // adjust the import path if needed
-import { Container, Box, TextField, Button, Typography, Avatar } from '@mui/material';
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import StoreRoundedIcon from "@mui/icons-material/StoreRounded";
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 
 interface User {
   firstName: string;
@@ -14,8 +12,6 @@ interface User {
   country: string;
   zip: string;
 }
-
-const defaultTheme = createTheme();
 
 const UserAcct = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -71,114 +67,91 @@ const UserAcct = () => {
   }
 
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs">
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: "tan" }}>
-            <StoreRoundedIcon sx={{ color: "black" }} />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            User Information
-          </Typography>
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleUserUpdate}
-            sx={{ mt: 3 }}
-          >
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="firstName"
-              label="First Name"
-              name="firstName"
-              autoComplete="given-name"
-              autoFocus
-              value={editUser.firstName}
-              onChange={handleInputChange}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="lastName"
-              label="Last Name"
-              name="lastName"
-              autoComplete="family-name"
-              value={editUser.lastName}
-              onChange={handleInputChange}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="address"
-              label="Address"
-              name="address"
-              autoComplete="address"
-              value={editUser.address}
-              onChange={handleInputChange}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="state"
-              label="State"
-              name="state"
-              autoComplete="state"
-              value={editUser.state}
-              onChange={handleInputChange}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="country"
-              label="Country"
-              name="country"
-              autoComplete="country"
-              value={editUser.country}
-              onChange={handleInputChange}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="zip"
-              label="Zip"
-              name="zip"
-              autoComplete="zip"
-              value={editUser.zip}
-              onChange={handleInputChange}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="success"
-              sx={{ mt: 3, mb: 2 }}
-            >
+    <Container className="py-5" style={{ maxWidth: "720px" }}>
+      <Card className="shadow-sm border-0">
+        <Card.Body className="p-4 p-md-5">
+          <h1 className="h4 mb-4">User Information</h1>
+          <Form onSubmit={handleUserUpdate}>
+            <Row>
+              <Col md={6} className="mb-3">
+                <Form.Label>First Name</Form.Label>
+                <Form.Control
+                  id="firstName"
+                  name="firstName"
+                  autoComplete="given-name"
+                  value={editUser.firstName}
+                  onChange={handleInputChange}
+                  required
+                  autoFocus
+                />
+              </Col>
+              <Col md={6} className="mb-3">
+                <Form.Label>Last Name</Form.Label>
+                <Form.Control
+                  id="lastName"
+                  name="lastName"
+                  autoComplete="family-name"
+                  value={editUser.lastName}
+                  onChange={handleInputChange}
+                  required
+                />
+              </Col>
+            </Row>
+
+            <Form.Group className="mb-3" controlId="address">
+              <Form.Label>Address</Form.Label>
+              <Form.Control
+                name="address"
+                autoComplete="address-line1"
+                value={editUser.address}
+                onChange={handleInputChange}
+                required
+              />
+            </Form.Group>
+
+            <Row>
+              <Col md={4} className="mb-3">
+                <Form.Label>State</Form.Label>
+                <Form.Control
+                  id="state"
+                  name="state"
+                  autoComplete="address-level1"
+                  value={editUser.state}
+                  onChange={handleInputChange}
+                  required
+                />
+              </Col>
+              <Col md={4} className="mb-3">
+                <Form.Label>Country</Form.Label>
+                <Form.Control
+                  id="country"
+                  name="country"
+                  autoComplete="country"
+                  value={editUser.country}
+                  onChange={handleInputChange}
+                  required
+                />
+              </Col>
+              <Col md={4} className="mb-3">
+                <Form.Label>Zip</Form.Label>
+                <Form.Control
+                  id="zip"
+                  name="zip"
+                  autoComplete="postal-code"
+                  value={editUser.zip}
+                  onChange={handleInputChange}
+                  required
+                />
+              </Col>
+            </Row>
+
+            <Button type="submit" variant="success" className="w-100">
               Update Information
             </Button>
-          </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+          </Form>
+        </Card.Body>
+      </Card>
+    </Container>
   );
 };
 
