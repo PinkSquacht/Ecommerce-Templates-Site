@@ -18,6 +18,16 @@ export type StoreTemplate = {
   heroSubheading: string;
   featuredCategories: string[];
   accentColor: string;
+  theme: {
+    bgBase: string;
+    bgPanel: string;
+    textMain: string;
+    textMuted: string;
+    lineSoft: string;
+    accent: string;
+    accentContrast: string;
+    navbarBg: string;
+  };
   productLayoutPreset: ProductLayoutPreset;
   productLayoutLabel: string;
 };
@@ -43,6 +53,16 @@ export const STORE_TEMPLATES: Record<StoreTemplateId, StoreTemplate> = {
       "Launch-ready technology storefront focused on practical, high-intent products.",
     featuredCategories: ALL_FAKESTORE_CATEGORIES,
     accentColor: "#008060",
+    theme: {
+      bgBase: "#f3f6f8",
+      bgPanel: "#fdfefe",
+      textMain: "#1d2733",
+      textMuted: "#556170",
+      lineSoft: "#c9d4dd",
+      accent: "#0f766e",
+      accentContrast: "#ffffff",
+      navbarBg: "#e8eff4",
+    },
     productLayoutPreset: "horizontal-stack",
     productLayoutLabel: "Horizontal Stack",
   },
@@ -56,6 +76,16 @@ export const STORE_TEMPLATES: Record<StoreTemplateId, StoreTemplate> = {
       "A template tuned for lifestyle merchandising, bundles, and visual storytelling.",
     featuredCategories: ALL_FAKESTORE_CATEGORIES,
     accentColor: "#7b5e57",
+    theme: {
+      bgBase: "#f7f2ec",
+      bgPanel: "#fffaf4",
+      textMain: "#332a24",
+      textMuted: "#6f6157",
+      lineSoft: "#dac9b8",
+      accent: "#8c5a3c",
+      accentContrast: "#ffffff",
+      navbarBg: "#f0e4d7",
+    },
     productLayoutPreset: "amazon-grid",
     productLayoutLabel: "Row and Column Grid",
   },
@@ -69,6 +99,16 @@ export const STORE_TEMPLATES: Record<StoreTemplateId, StoreTemplate> = {
       "A conversion-oriented fitness storefront template centered on goals and routines.",
     featuredCategories: ALL_FAKESTORE_CATEGORIES,
     accentColor: "#1f6feb",
+    theme: {
+      bgBase: "#f1f4f8",
+      bgPanel: "#fbfdff",
+      textMain: "#1b2430",
+      textMuted: "#596578",
+      lineSoft: "#c7d2e3",
+      accent: "#1d4ed8",
+      accentContrast: "#ffffff",
+      navbarBg: "#e3ebf7",
+    },
     productLayoutPreset: "amazon-grid",
     productLayoutLabel: "Row and Column Grid",
   },

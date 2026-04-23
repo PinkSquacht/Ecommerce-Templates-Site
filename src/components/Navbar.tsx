@@ -73,12 +73,7 @@ function ResponsiveAppBar() {
   };
 
   return (
-    <Navbar
-      expand="lg"
-      sticky="top"
-      className="py-2"
-      style={{ backgroundColor: "#f1ece1", borderBottom: `4px solid ${activeTemplate.accentColor}` }}
-    >
+    <Navbar expand="lg" sticky="top" className="py-2 theme-navbar">
       <Container fluid>
         <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2 fw-bold">
           <BsShop />
@@ -105,7 +100,7 @@ function ResponsiveAppBar() {
               </>
             ) : (
               <Link to="/login" className="text-decoration-none">
-                <Button variant="outline-success" size="sm">
+                <Button variant="light" size="sm" className="btn-theme-outline">
                   Login
                 </Button>
               </Link>
@@ -113,9 +108,9 @@ function ResponsiveAppBar() {
 
             <Link to="/cart" className="text-decoration-none" title={`Open Cart (${cartItemCount} items)`}>
               <Button
-                variant="dark"
+                variant="light"
                 size="sm"
-                className="d-flex align-items-center gap-2"
+                className="d-flex align-items-center gap-2 btn-theme-solid"
               >
                 <BsCart3 />
                 <Badge bg="light" text="dark">{cartItemCount}</Badge>

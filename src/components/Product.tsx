@@ -79,8 +79,8 @@ const Product = ({ product }: { product: any }) => {
             <Col xs={12} md={2} className="d-flex justify-content-center pb-3 pb-md-0">
               <Button
                 onClick={handleAddToCart}
-                variant="success"
-                style={{ backgroundColor: "#008060", borderColor: "#008060" }}
+                variant="light"
+                className="btn-theme-solid"
               >
                 <BsPlus /> Add to Cart
               </Button>
@@ -116,8 +116,9 @@ const Product = ({ product }: { product: any }) => {
         <Card.Footer className="d-flex justify-content-center">
           <Button
             onClick={handleAddToCart}
-            variant="success"
-            style={{ marginRight: "5px", backgroundColor: "#008060", borderColor: "#008060" }}
+            variant="light"
+            className="btn-theme-solid"
+            style={{ marginRight: "5px" }}
           >
             <BsPlus /> Add to Cart
           </Button>

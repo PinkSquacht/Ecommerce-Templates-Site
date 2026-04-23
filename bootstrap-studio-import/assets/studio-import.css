@@ -1,0 +1,134 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap");
+
+:root {
+  --bg-base: #f6f4ef;
+  --bg-panel: #fffef9;
+  --text-main: #1f252d;
+  --text-muted: #5d6571;
+  --line-soft: #d6d0c2;
+  --highlight: #008060;
+  --shadow-soft: 0 14px 40px rgba(31, 37, 45, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  color: var(--text-main);
+  background:
+    radial-gradient(circle at top right, rgba(0, 128, 96, 0.1), transparent 38%),
+    radial-gradient(circle at bottom left, rgba(31, 111, 235, 0.08), transparent 32%),
+    var(--bg-base);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.storefront-shell {
+  padding-bottom: 2rem;
+}
+
+.hero-panel {
+  background: var(--bg-panel);
+  border: 2px solid var(--line-soft);
+  border-radius: 20px;
+  padding: 1.8rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.hero-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+  color: var(--text-muted);
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+}
+
+.hero-subtitle {
+  color: var(--text-muted);
+  max-width: 760px;
+}
+
+.control-block label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.hero-metrics article {
+  background: #fbfaf5;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 0.75rem;
+  height: 100%;
+}
+
+.hero-metrics h4 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.hero-metrics p {
+  margin: 0.3rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.83rem;
+}
+
+.category-row-block {
+  background: #fbfaf5;
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  padding: 0.65rem 0.85rem 0.95rem;
+}
+
+.category-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--line-soft);
+  padding: 0.35rem 0.1rem 0.65rem;
+}
+
+.category-row-header h2 {
+  text-transform: capitalize;
+}
+
+.category-row-header span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.amazon-card-col {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  border-radius: 14px;
+  border: 1px solid var(--line-soft);
+}
+
+.amazon-card-col img {
+  height: 160px;
+  object-fit: contain;
+}
+
+.amazon-card-col .card-title,
+.amazon-card-col h3 {
+  font-size: 0.95rem;
+}
+
+.amazon-card-col .btn-success {
+  background-color: var(--highlight);
+  border-color: var(--highlight);
+}
+
+@media (max-width: 900px) {
+  .hero-panel {
+    padding: 1.15rem;
+  }
+}

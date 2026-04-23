@@ -7,6 +7,8 @@
 	--text-muted: #5d6571;
 	--line-soft: #d6d0c2;
 	--highlight: #008060;
+	--accent-contrast: #ffffff;
+	--navbar-bg: #f1ece1;
 	--shadow-soft: 0 14px 40px rgba(31, 37, 45, 0.12);
 }
 
@@ -182,6 +184,37 @@ h4 {
 	border-radius: 14px;
 	background: var(--bg-panel);
 	padding: 1rem;
+}
+
+.theme-navbar {
+	background-color: var(--navbar-bg);
+	border-bottom: 4px solid var(--highlight);
+}
+
+.btn-theme-solid {
+	background-color: var(--highlight);
+	border-color: var(--highlight);
+	color: var(--accent-contrast);
+}
+
+.btn-theme-solid:hover,
+.btn-theme-solid:focus {
+	background-color: color-mix(in srgb, var(--highlight) 88%, #000000 12%);
+	border-color: color-mix(in srgb, var(--highlight) 88%, #000000 12%);
+	color: var(--accent-contrast);
+}
+
+.btn-theme-outline {
+	border-color: var(--highlight);
+	color: var(--highlight);
+	background-color: transparent;
+}
+
+.btn-theme-outline:hover,
+.btn-theme-outline:focus {
+	background-color: var(--highlight);
+	border-color: var(--highlight);
+	color: var(--accent-contrast);
 }
 
 @media (max-width: 900px) {

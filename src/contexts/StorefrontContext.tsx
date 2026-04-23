@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   DEFAULT_STORE_TEMPLATE,
   PRODUCT_LAYOUT_OPTIONS,
@@ -132,6 +132,24 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
       setActiveLayoutPreset: setLayoutPreset,
     };
   }, [activeLayoutPreset, activeTemplateId, activeTierId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const root = document.documentElement;
+    const theme = STORE_TEMPLATES[activeTemplateId].theme;
+
+    root.style.setProperty("--bg-base", theme.bgBase);
+    root.style.setProperty("--bg-panel", theme.bgPanel);
+    root.style.setProperty("--text-main", theme.textMain);
+    root.style.setProperty("--text-muted", theme.textMuted);
+    root.style.setProperty("--line-soft", theme.lineSoft);
+    root.style.setProperty("--highlight", theme.accent);
+    root.style.setProperty("--accent-contrast", theme.accentContrast);
+    root.style.setProperty("--navbar-bg", theme.navbarBg);
+  }, [activeTemplateId]);
 
   return <StorefrontContext.Provider value={value}>{children}</StorefrontContext.Provider>;
 }

@@ -1,7 +1,6 @@
 import "./App.css";
 import { Suspense, lazy } from "react";
 import Home from "./veiws/Home";
-import Product from "./components/Product";
 import { Routes, Route } from "react-router-dom";
 import { useStorefront } from "./contexts/StorefrontContext";
 
@@ -28,7 +27,10 @@ function App() {
         <Route path="/admin" element={activeTier.hasAdminDashboard ? <AdminDashboard /> : <Home />} />
         <Route path="/studio" element={<StudioDesign />} />
         {/* Dedicated product route placeholder for future PDP work. */}
-        <Route path="/product/:id" element={<Product product={null} />} />
+        <Route
+          path="/product/:id"
+          element={<div className="storefront-shell">Product detail page coming soon.</div>}
+        />
       </Routes>
     </Suspense>
   );
