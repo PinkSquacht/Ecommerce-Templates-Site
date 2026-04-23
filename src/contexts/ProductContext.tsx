@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
-import { useStorefront } from "./StorefrontContext";
-import type { StoreTemplateId } from "../config/storeTemplates";
+import { useStorefront } from "./useStorefront";
+import type { StoreTemplateId } from "../config/storeTemplates.ts";
 
 export type CatalogProduct = {
   id: string;

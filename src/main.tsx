@@ -3,7 +3,6 @@ import App from "./App.tsx";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import "./design/bootstrap-studio/css/studio-overrides.css";
 import { BrowserRouter } from "react-router-dom";
 import Navbar from "./components/Navbar.tsx";
 import ProductProvider from "./contexts/ProductContext.tsx";

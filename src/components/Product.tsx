@@ -1,60 +1,38 @@
 import { BsPlus } from "react-icons/bs";
 import { Card, Button, Col, Row } from "react-bootstrap";
-import { db } from "../firebase";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { auth } from "../firebase";
-import { useStorefront } from "../contexts/StorefrontContext";
+import { useStorefront } from "../contexts/useStorefront";
+import { useCart } from "../contexts/useCart";
 
 const Product = ({ product }: { product: any }) => {
+  // Product cards adapt to the current template so the same catalog can feel different by brand.
   const { id, title, price, image, description } = product;
-  const userId = auth.currentUser ? auth.currentUser.uid : null;
-  const { activeLayoutPreset } = useStorefront();
-  const isHorizontalStack = activeLayoutPreset === "horizontal-stack";
+  const { activeTemplate } = useStorefront();
+  const { addToCart, isAuthenticated } = useCart();
+  const isEditorialCard = activeTemplate.productCardStyle === "editorial" || activeTemplate.productCardStyle === "mobile";
 
   const handleAddToCart = async () => {
-    if (!userId) {
-      console.error("User not authenticated.");
+    // Guard against anonymous cart writes so the Firestore path stays tied to a user account.
+    if (!isAuthenticated) {
+      console.error("User must be signed in to add items to cart.");
       return;
     }
 
-    const cartItemRef = doc(db, "users", userId, "cartItems", id.toString());
-
     try {
-      const cartItemDoc = await getDoc(cartItemRef);
-
-      if (cartItemDoc.exists()) {
-        const currentQuantity = cartItemDoc.data()?.quantity || 0;
-        const newQuantity = currentQuantity + 1;
-
-        await updateDoc(cartItemRef, {
-          quantity: newQuantity,
-        });
-
-        console.log("Item quantity updated in Firestore!");
-      } else {
-        await setDoc(cartItemRef, {
-          id,
-          title,
-          price,
-          image,
-          description,
-          quantity: 1,
-        });
-
-        console.log("Item added to Firestore!");
-      }
+      // Delegate all cart mutation logic to the shared cart context.
+      await addToCart({ id, title, price, image, description, category: product.category });
     } catch (error) {
       console.error("Error adding item to cart:", error);
     }
   };
 
-  if (isHorizontalStack) {
+  if (isEditorialCard) {
     return (
       <Col xs={12} className="d-flex justify-content-center">
         <Card
-          className="w-100 my-2"
-          style={{ maxWidth: "980px", borderRadius: "14px", border: "1px solid #d6d0c2" }}
+          className={`w-100 my-2 storefront-product-card storefront-product-card--${activeTemplate.productCardStyle}`}
+          style={{ maxWidth: activeTemplate.productCardStyle === "mobile" ? "920px" : "980px" }}
         >
+          {/* Editorial and mobile templates use a wider layout to make the product feel more premium. */}
           <Row className="g-0 align-items-center">
             <Col xs={12} md={3} className="p-3">
               <Card.Img
@@ -67,8 +45,8 @@ const Product = ({ product }: { product: any }) => {
             </Col>
             <Col xs={12} md={7}>
               <Card.Body>
-                <Card.Title style={{ fontSize: "1rem" }}>{title}</Card.Title>
-                <Card.Text style={{ wordBreak: "break-word", fontSize: "0.9rem", color: "#5d6571" }}>
+                <Card.Title className="storefront-product-title">{title}</Card.Title>
+                <Card.Text style={{ wordBreak: "break-word", fontSize: "0.9rem" }}>
                   {description}
                 </Card.Text>
                 <Card.Text>
@@ -94,9 +72,10 @@ const Product = ({ product }: { product: any }) => {
   return (
     <Col xs="auto" className="d-flex justify-content-center amazon-card-col">
       <Card
-        className="h-100 my-3 text-center"
-        style={{ width: "100%", maxWidth: "210px", borderRadius: "14px", border: "1px solid #d6d0c2" }}
+        className={`h-100 my-3 text-center storefront-product-card storefront-product-card--${activeTemplate.productCardStyle}`}
+        style={{ width: "100%", maxWidth: activeTemplate.productCardStyle === "performance" ? "200px" : "218px" }}
       >
+        {/* Shelf-style templates use compact cards so shoppers can scan rows quickly. */}
         <Card.Img
           variant="top"
           src={image}
@@ -105,10 +84,18 @@ const Product = ({ product }: { product: any }) => {
           style={{ height: "160px", objectFit: "contain" }}
         />
         <Card.Body>
-          <Card.Title style={{ fontSize: "0.95rem" }}>{title}</Card.Title>
-          <Card.Text style={{ wordBreak: "break-word", fontSize: "0.84rem", color: "#5d6571" }}>
+          <Card.Title className="storefront-product-title">{title}</Card.Title>
+          <Card.Text style={{ wordBreak: "break-word", fontSize: "0.84rem" }}>
             {description}
           </Card.Text>
+          {(activeTemplate.productCardStyle === "trust" || activeTemplate.productCardStyle === "proof") ? (
+            // Trust and proof templates add quick reassurance close to the CTA.
+            <div className="product-proof-row">
+              <span>4.8/5 rating</span>
+              <span>Ships fast</span>
+              <span>Easy returns</span>
+            </div>
+          ) : null}
           <Card.Text>
             <strong>Price:</strong> ${price}
           </Card.Text>

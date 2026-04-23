@@ -1,255 +1,144 @@
-import { useEffect, useState } from "react";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
-import { auth } from "../firebase";
-import { Card, Button, Col, Row } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { onAuthStateChanged } from "firebase/auth";
-import { increment, updateDoc } from "firebase/firestore";
-
-interface CartItem {
-  id: string;
-  title: string;
-  price: number;
-  image: string;
-  description: string;
-  quantity: number;
-}
+import { useNavigate, Link } from "react-router-dom";
+import { Alert, Button, Card, Col, Row } from "react-bootstrap";
+import { useCart } from "../contexts/useCart";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  // Pull the shared cart state so the page stays in sync with the navbar and product buttons.
   const navigate = useNavigate();
+  const {
+    cartItems,
+    cartCount,
+    cartSubtotal,
+    isAuthenticated,
+    isLoading,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+  } = useCart();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("User authenticated:", user.uid);
-        // User is authenticated, fetch cart items
-        fetchCartItems(user.uid);
-      } else {
-        // User is not authenticated, redirect to home page
-        navigate("/");
-      }
-    });
-
-    return () => unsubscribe();
-  }, [navigate]);
-
-  const fetchCartItems = async (userId: string) => {
-    const db = getFirestore();
-    const cartItemsCollection = collection(db, "users", userId, "cartItems");
-    const cartItemsSnapshot = await getDocs(cartItemsCollection);
-    const cartItemsList: CartItem[] = cartItemsSnapshot.docs.map(
-      (doc) =>
-        ({
-          id: doc.id,
-          ...doc.data(),
-        } as CartItem)
-    );
-    setCartItems(cartItemsList);
-  };
-
-  const increaseQuantity = async (itemId: string) => {
-    setCartItems((prevCartItems) =>
-      prevCartItems.map((item) =>
-        item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
-
-    await updateFirestoreQuantity(itemId, 1);
-  };
-
-  const decreaseQuantity = async (itemId: string) => {
-    setCartItems((prevCartItems) => {
-      const updatedCart = prevCartItems.map((item) =>
-        item.id === itemId && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      );
-      return updatedCart.filter((item) => item.quantity > 0);
-    });
-
-    await updateFirestoreQuantity(itemId, -1);
-  };
-
-  const updateFirestoreQuantity = async (itemId: string, change: number) => {
-    const userId = auth.currentUser?.uid;
-
-    if (!userId) {
-      console.error("User not authenticated.");
-      return;
-    }
-
-    const db = getFirestore();
-    const cartItemRef = doc(db, "users", userId, "cartItems", String(itemId));
-
-    try {
-      await updateDoc(cartItemRef, {
-        quantity: increment(change),
-      });
-      console.log("Item quantity updated in Firestore!");
-    } catch (error) {
-      console.error("Error updating item quantity in Firestore:", error);
-    }
-  };
-
-  const removeItem = async (itemId: string) => {
-    const userId = auth.currentUser?.uid;
-
-    if (!userId) {
-      console.error("User not authenticated.");
-      return;
-    }
-
-    // Remove from local cart
-    setCartItems((prevCartItems) =>
-      prevCartItems.filter((item) => item.id !== itemId)
-    );
-
-    // Remove from Firestore collection
-    const db = getFirestore();
-    const cartItemRef = doc(db, "users", userId, "cartItems", String(itemId)); // Convert itemId to string
-
-    console.log("Removing item from Firestore. Path:", cartItemRef.path);
-
-    try {
-      await deleteDoc(cartItemRef);
-      console.log("Item removed from Firestore");
-    } catch (error) {
-      console.error("Error removing item from Firestore:", error);
-    }
-  };
-
-  const calculateTotalPrice = () => {
-    return cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
-  };
-
-  const handleCheckout = () => {
-    // Add logic for handling checkout
-  };
-
-  const handleRedirectToHome = () => {
-    // Redirect to the home page
+  const handleContinueShopping = () => {
+    // Send the customer back into the storefront when the cart is empty or they want to browse more.
     navigate("/");
   };
 
+  const handleCheckout = () => {
+    // Checkout will connect to a payment provider once the backend flow is ready.
+    console.log("Checkout clicked");
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container storefront-shell cart-shell">
+        {/* Signed-out users get a short explanation and a login path instead of an empty cart screen. */}
+        <Alert variant="info" className="cart-empty-alert">
+          <Alert.Heading>Sign in to see your cart</Alert.Heading>
+          <p>Your cart is tied to your account, so log in first to review saved items.</p>
+          <div className="d-flex gap-2 flex-wrap">
+              <Link to="/login" className="text-decoration-none">
+                <Button className="btn-theme-solid" variant="light">
+                  Go to Login
+                </Button>
+              </Link>
+            <Button onClick={handleContinueShopping} className="btn-theme-outline" variant="light">
+              Continue Shopping
+            </Button>
+          </div>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container storefront-shell cart-shell">
+        {/* Keep the loading state simple because the cart contents are coming from Firestore. */}
+        <div className="cart-empty-state">Loading your cart...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mt-5">
+    <div className="container storefront-shell cart-shell">
+      <section className="cart-header-card">
+        <p className="hero-eyebrow">Your Cart</p>
+        <h1>{cartCount} items ready for checkout</h1>
+        <p>
+          Review quantities, remove anything you do not need, and continue when you are ready.
+        </p>
+      </section>
+
       {cartItems.length > 0 ? (
-        <>
-          <Row xs={1} md={2} lg={3} className="g-4">
-            {cartItems.map((item) => (
-              <Col key={item.id} className="d-flex justify-content-center">
-                <Card
-                  className="h-100 my-3 text-center"
-                  style={{ paddingTop: "20px" }}
-                >
-                  <Row className="no-gutters">
-                    <Col xs={4}>
-                      <Card.Img
-                        variant="top"
-                        src={item.image}
-                        alt={item.title}
-                        className="img-fluid"
-                        style={{ maxHeight: "100px", objectFit: "cover" }}
-                      />
+        <Row className="g-3 align-items-start">
+          <Col lg={8}>
+            {/* The left column shows each line item with quantity controls. */}
+            <div className="cart-item-list">
+              {cartItems.map((item) => (
+                <Card key={item.id} className="cart-item-card storefront-product-card">
+                  <Row className="g-0 align-items-center">
+                    <Col xs={4} md={3} className="p-3">
+                      <Card.Img src={item.image} alt={item.title} className="cart-item-image" />
                     </Col>
-                    <Col xs={8}>
+                    <Col xs={8} md={9}>
                       <Card.Body>
-                        <Card.Title>{item.title}</Card.Title>
-                        <Card.Text className="text-muted">
-                          {item.description}
-                        </Card.Text>
-                        <Card.Text className="fw-bold">
-                          Price: ${item.price.toFixed(2)}
-                        </Card.Text>
-                        <Card.Text className="mb-3 d-flex align-items-center">
-                          Quantity: {item.quantity}
-                          <Button
-                            onClick={() => decreaseQuantity(item.id)}
-                            variant="outline-secondary"
-                            size="sm"
-                            className="ms-2"
-                            style={{
-                              marginRight: "5px",
-                              backgroundColor: "#28a745",
-                              borderColor: "#28a745",
-                            }}
-                          >
+                        <Card.Title className="storefront-product-title">{item.title}</Card.Title>
+                        <Card.Text className="cart-item-description">{item.description}</Card.Text>
+                        <div className="cart-item-meta-row">
+                          <span>Price: ${item.price.toFixed(2)}</span>
+                          <span>Qty: {item.quantity}</span>
+                        </div>
+                        <div className="cart-item-actions">
+                          <Button onClick={() => decreaseQuantity(item.id)} variant="light" className="btn-theme-outline">
                             -
                           </Button>
-                          <Button
-                            onClick={() => increaseQuantity(item.id)}
-                            variant="outline-secondary"
-                            size="sm"
-                            className="ms-2"
-                            style={{
-                              marginRight: "5px",
-                              backgroundColor: "#28a745",
-                              borderColor: "#28a745",
-                            }}
-                          >
+                          <Button onClick={() => increaseQuantity(item.id)} variant="light" className="btn-theme-solid">
                             +
                           </Button>
-                        </Card.Text>
-                        <Button
-                          onClick={() => removeItem(item.id)}
-                          variant="danger"
-                          size="sm"
-                          style={{
-                            marginRight: "5px",
-                            backgroundColor: "#28a745",
-                            borderColor: "#28a745",
-                          }}
-                        >
-                          Remove Item
-                        </Button>
+                          <Button onClick={() => removeFromCart(item.id)} variant="outline-danger">
+                            Remove
+                          </Button>
+                        </div>
                       </Card.Body>
                     </Col>
                   </Row>
                 </Card>
-              </Col>
-            ))}
-          </Row>
-          <div className="mt-3">
-            <p className="fw-bold">
-              Total Price: ${calculateTotalPrice().toFixed(2)}
-            </p>
-            <Button
-              onClick={handleCheckout}
-              variant="success"
-              size="lg"
-              style={{
-                marginRight: "5px",
-                backgroundColor: "#28a745",
-                borderColor: "#28a745",
-              }}
-            >
-              Proceed to Checkout
-            </Button>
-          </div>
-        </>
+              ))}
+            </div>
+          </Col>
+
+          <Col lg={4}>
+            {/* The right column summarizes the order and provides the checkout action. */}
+            <Card className="cart-summary-card storefront-product-card">
+              <Card.Body>
+                <p className="hero-eyebrow">Order Summary</p>
+                <h2>Total: ${cartSubtotal.toFixed(2)}</h2>
+                <p className="cart-summary-copy">
+                  This is the checkout-ready subtotal before taxes, shipping, or discounts.
+                </p>
+                <div className="cart-summary-lines">
+                  <div>
+                    <span>Items</span>
+                    <strong>{cartCount}</strong>
+                  </div>
+                  <div>
+                    <span>Subtotal</span>
+                    <strong>${cartSubtotal.toFixed(2)}</strong>
+                  </div>
+                </div>
+                <Button onClick={handleCheckout} className="btn-theme-solid w-100 mt-3" variant="light">
+                  Proceed to Checkout
+                </Button>
+                <Button onClick={handleContinueShopping} className="btn-theme-outline w-100 mt-2" variant="light">
+                  Continue Shopping
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
       ) : (
-        <div className="text-center">
-          <p>Your cart is empty.</p>
-          <Button
-            onClick={handleRedirectToHome}
-            variant="success"
-            size="lg"
-            style={{
-              marginRight: "5px",
-              backgroundColor: "#28a745",
-              borderColor: "#28a745",
-            }}
-          >
+        <div className="cart-empty-state">
+          <h2>Your cart is empty.</h2>
+          <p>Browse the storefront and add a few items to see the cart in action.</p>
+          <Button onClick={handleContinueShopping} className="btn-theme-solid" variant="light">
             Go to Home Page
           </Button>
         </div>

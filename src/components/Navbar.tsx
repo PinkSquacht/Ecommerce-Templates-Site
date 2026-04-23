@@ -4,12 +4,13 @@ import { Badge, Button, Container, Nav, Navbar } from "react-bootstrap";
 import { BsCart3, BsShop } from "react-icons/bs";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { useStorefront } from "../contexts/StorefrontContext";
+import { useStorefront } from "../contexts/useStorefront";
+import { useCart } from "../contexts/useCart";
 
 // Navbar combines template branding with auth status and cart summary.
 
 const pages = [
+  // Public-facing navigation links for core storefront/account navigation.
   { name: "Home", path: "/" },
   { name: "Account", path: "/user" },
   { name: "Signup", path: "/signup" },
@@ -21,30 +22,22 @@ interface IUser {
 }
 
 function ResponsiveAppBar() {
+  // The navbar shows the current brand identity plus lightweight account/cart status.
   const [user, setUser] = useState<IUser>({ uid: "", email: "" });
-  const [cartItemCount, setCartItemCount] = useState(0);
   const { activeTemplate, activeTier } = useStorefront();
-
-  const fetchCartItemCount = async (userId: string) => {
-    // Cart quantity is aggregated from user cartItems docs in Firestore.
-    const db = getFirestore();
-    const cartItemsCollection = collection(db, 'users', userId, 'cartItems');
-    const cartItemsSnapshot = await getDocs(cartItemsCollection);
-    const itemCount = cartItemsSnapshot.docs.reduce((count, doc) => count + (doc.data().quantity || 0), 0);
-    setCartItemCount(itemCount);
-  };
+  const { cartCount } = useCart();
 
   useEffect(() => {
+    // Keep the top bar synced with Firebase auth so the login/logout view stays current.
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         if (typeof user.email === "string") {
+          // Store only the user fields the navbar actually needs.
           setUser({
             uid: user.uid,
             email: user.email,
           });
 
-          // Fetch cart item count from Firestore
-          fetchCartItemCount(user.uid);
         }
       }
     });
@@ -53,16 +46,8 @@ function ResponsiveAppBar() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const userId = user.uid;
-
-    if (userId) {
-      // Update the cart item count whenever there's a change in cart items
-      fetchCartItemCount(userId);
-    }
-  }, [user]);
-
   const handleSignout = () => {
+    // Sign out and reset the local navbar identity state.
     signOut(auth)
       .then(() => {
         setUser({ uid: "", email: "" });
@@ -106,14 +91,14 @@ function ResponsiveAppBar() {
               </Link>
             )}
 
-            <Link to="/cart" className="text-decoration-none" title={`Open Cart (${cartItemCount} items)`}>
+            <Link to="/cart" className="text-decoration-none" title={`Open Cart (${cartCount} items)`}>
               <Button
                 variant="light"
                 size="sm"
                 className="d-flex align-items-center gap-2 btn-theme-solid"
               >
                 <BsCart3 />
-                <Badge bg="light" text="dark">{cartItemCount}</Badge>
+                <Badge bg="light" text="dark">{cartCount}</Badge>
               </Button>
             </Link>
           </div>

@@ -1,12 +1,10 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import {
   DEFAULT_STORE_TEMPLATE,
-  PRODUCT_LAYOUT_OPTIONS,
   STORE_TEMPLATES,
-  type ProductLayoutPreset,
   type StoreTemplate,
   type StoreTemplateId,
-} from "../config/storeTemplates";
+} from "../config/storeTemplates.ts";
 import {
   DEFAULT_SERVICE_TIER,
   SERVICE_TIERS,
@@ -26,11 +24,9 @@ type StorefrontContextValue = {
   activeTier: ServiceTier;
   availableTiers: ServiceTier[];
   setActiveTierId: (tierId: ServiceTierId) => void;
-  activeLayoutPreset: ProductLayoutPreset;
-  setActiveLayoutPreset: (layoutPreset: ProductLayoutPreset) => void;
 };
 
-const StorefrontContext = createContext<StorefrontContextValue | undefined>(undefined);
+export const StorefrontContext = createContext<StorefrontContextValue | undefined>(undefined);
 
 function resolveInitialTemplateId(): StoreTemplateId {
   // Priority order: query param -> local storage -> default template.
@@ -69,29 +65,10 @@ function resolveInitialTierId(): ServiceTierId {
   return DEFAULT_SERVICE_TIER;
 }
 
-function resolveInitialLayoutPreset(): ProductLayoutPreset {
-  if (typeof window === "undefined") {
-    return STORE_TEMPLATES[DEFAULT_STORE_TEMPLATE].productLayoutPreset;
-  }
-
-  const layoutParam = new URLSearchParams(window.location.search).get("layout");
-  const layoutIds = PRODUCT_LAYOUT_OPTIONS.map((layout) => layout.id);
-  if (layoutParam && layoutIds.includes(layoutParam as ProductLayoutPreset)) {
-    return layoutParam as ProductLayoutPreset;
-  }
-
-  const storedLayout = window.localStorage.getItem("activeLayoutPreset");
-  if (storedLayout && layoutIds.includes(storedLayout as ProductLayoutPreset)) {
-    return storedLayout as ProductLayoutPreset;
-  }
-
-  return STORE_TEMPLATES[DEFAULT_STORE_TEMPLATE].productLayoutPreset;
-}
-
 export function StorefrontProvider({ children }: { children: React.ReactNode }) {
+  // Template and tier together define what the storefront is and what tools the client can access.
   const [activeTemplateId, setActiveTemplateId] = useState<StoreTemplateId>(resolveInitialTemplateId);
   const [activeTierId, setActiveTierId] = useState<ServiceTierId>(resolveInitialTierId);
-  const [activeLayoutPreset, setActiveLayoutPreset] = useState<ProductLayoutPreset>(resolveInitialLayoutPreset);
 
   const setTemplate = (templateId: StoreTemplateId) => {
     // Persist template changes so client demo previews survive refreshes.
@@ -110,14 +87,6 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     }
   };
 
-  const setLayoutPreset = (layoutPreset: ProductLayoutPreset) => {
-    setActiveLayoutPreset(layoutPreset);
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("activeLayoutPreset", layoutPreset);
-    }
-  };
-
   const value = useMemo<StorefrontContextValue>(() => {
     return {
       activeTemplateId,
@@ -128,10 +97,8 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
       activeTier: SERVICE_TIERS[activeTierId],
       availableTiers: Object.values(SERVICE_TIERS),
       setActiveTierId: setTier,
-      activeLayoutPreset,
-      setActiveLayoutPreset: setLayoutPreset,
     };
-  }, [activeLayoutPreset, activeTemplateId, activeTierId]);
+  }, [activeTemplateId, activeTierId]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -141,6 +108,10 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     const root = document.documentElement;
     const theme = STORE_TEMPLATES[activeTemplateId].theme;
 
+    // Expose the active template id so CSS can target template-specific presentation rules.
+    root.dataset.storeTemplate = activeTemplateId;
+
+    // Push the selected template's tokens into CSS variables for app-wide restyling.
     root.style.setProperty("--bg-base", theme.bgBase);
     root.style.setProperty("--bg-panel", theme.bgPanel);
     root.style.setProperty("--text-main", theme.textMain);
@@ -149,18 +120,13 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     root.style.setProperty("--highlight", theme.accent);
     root.style.setProperty("--accent-contrast", theme.accentContrast);
     root.style.setProperty("--navbar-bg", theme.navbarBg);
+    root.style.setProperty("--font-heading", theme.fontHeading);
+    root.style.setProperty("--font-body", theme.fontBody);
+    root.style.setProperty("--hero-glow-a", theme.glowA);
+    root.style.setProperty("--hero-glow-b", theme.glowB);
+    root.style.setProperty("--card-radius", theme.cardRadius);
+    root.style.setProperty("--card-shadow", theme.cardShadow);
   }, [activeTemplateId]);
 
   return <StorefrontContext.Provider value={value}>{children}</StorefrontContext.Provider>;
-}
-
-export function useStorefront() {
-  // Hook wrapper keeps template access consistent across components.
-  const context = useContext(StorefrontContext);
-
-  if (!context) {
-    throw new Error("useStorefront must be used within a StorefrontProvider");
-  }
-
-  return context;
 }
