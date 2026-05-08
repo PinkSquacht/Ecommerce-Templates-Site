@@ -28,6 +28,23 @@ type StorefrontContextValue = {
 
 export const StorefrontContext = createContext<StorefrontContextValue | undefined>(undefined);
 
+function safeReadStorage(key: string): string | null {
+  // Some environments (strict privacy mode, embedded webviews) can throw on storage access.
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeWriteStorage(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Ignore persistence errors; runtime state should still update in memory.
+  }
+}
+
 function resolveInitialTemplateId(): StoreTemplateId {
   // Priority order: query param -> local storage -> default template.
   if (typeof window === "undefined") {
@@ -39,7 +56,7 @@ function resolveInitialTemplateId(): StoreTemplateId {
     return templateParam as StoreTemplateId;
   }
 
-  const storedTemplate = window.localStorage.getItem("activeStoreTemplate");
+  const storedTemplate = safeReadStorage("activeStoreTemplate");
   if (storedTemplate && storedTemplate in STORE_TEMPLATES) {
     return storedTemplate as StoreTemplateId;
   }
@@ -57,7 +74,7 @@ function resolveInitialTierId(): ServiceTierId {
     return tierParam as ServiceTierId;
   }
 
-  const storedTier = window.localStorage.getItem("activeServiceTier");
+  const storedTier = safeReadStorage("activeServiceTier");
   if (storedTier && storedTier in SERVICE_TIERS) {
     return storedTier as ServiceTierId;
   }
@@ -75,7 +92,7 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     setActiveTemplateId(templateId);
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("activeStoreTemplate", templateId);
+      safeWriteStorage("activeStoreTemplate", templateId);
     }
   };
 
@@ -83,7 +100,7 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     setActiveTierId(tierId);
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("activeServiceTier", tierId);
+      safeWriteStorage("activeServiceTier", tierId);
     }
   };
 
