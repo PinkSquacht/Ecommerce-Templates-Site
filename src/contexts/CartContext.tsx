@@ -59,8 +59,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
 
     try {
-      const cartItemsCollection = collection(db, "users", currentUserId, "cartItems");
-      const cartItemsSnapshot = await getDocs(cartItemsCollection);
+      const cartItemsSnapshot = await getDocs(collection(db, "users", currentUserId, "cartItems"));
       const items = cartItemsSnapshot.docs.map((snapshot) =>
         normalizeCartItem(snapshot.id, snapshot.data() as Partial<CartItem>)
       );

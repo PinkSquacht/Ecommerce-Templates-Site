@@ -26,6 +26,35 @@ const Cart = () => {
     console.log("Checkout clicked");
   };
 
+  // const handleCheckout = async () => {
+  //   if (!userId || cartItems.length === 0 || isSubmitting) {
+  //     return;
+  //   }
+  //
+  //   setIsSubmitting(true);
+  //   setCheckoutMessage(null);
+  //
+  //   try {
+  //     const result = await createOrderFromCart(db, {
+  //       userId,
+  //       cartItems: cartItems.map((item) => ({
+  //         ...item,
+  //         productId: item.id,
+  //       })),
+  //       shippingCost: 0,
+  //       tax: 0,
+  //     });
+  //
+  //     await refreshCart();
+  //     setCheckoutMessage(`Order ${result.orderId} created.`);
+  //     navigate("/");
+  //   } catch (error) {
+  //     setCheckoutMessage(error instanceof Error ? error.message : "Unable to create order.");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
   if (!isAuthenticated) {
     return (
       <div className="container storefront-shell cart-shell">
@@ -114,6 +143,7 @@ const Cart = () => {
                 <p className="cart-summary-copy">
                   This is the checkout-ready subtotal before taxes, shipping, or discounts.
                 </p>
+                {/* Checkout wiring is commented out for easier review and potential re-enable later. */}
                 <div className="cart-summary-lines">
                   <div>
                     <span>Items</span>
@@ -124,6 +154,14 @@ const Cart = () => {
                     <strong>${cartSubtotal.toFixed(2)}</strong>
                   </div>
                 </div>
+                {/* <Button
+                  onClick={handleCheckout}
+                  className="btn-theme-solid w-100 mt-3"
+                  variant="light"
+                  disabled={isSubmitting || cartItems.length === 0}
+                >
+                  {isSubmitting ? "Creating Order..." : "Proceed to Checkout"}
+                </Button> */}
                 <Button onClick={handleCheckout} className="btn-theme-solid w-100 mt-3" variant="light">
                   Proceed to Checkout
                 </Button>
